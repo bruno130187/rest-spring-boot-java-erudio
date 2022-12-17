@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class RestSpringBootJavaErudioApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(RestSpringBootJavaErudioApplication.class, args);
+
 	}
 
 }
