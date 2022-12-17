@@ -1,5 +1,6 @@
-package br.com.erudio.restspringbootjavaerudio;
+package br.com.erudio.restspringbootjavaerudio.controllers;
 
+import br.com.erudio.restspringbootjavaerudio.greeting.Greeting;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

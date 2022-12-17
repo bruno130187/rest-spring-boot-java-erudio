@@ -1,4 +1,4 @@
-package br.com.erudio.restspringbootjavaerudio;
+package br.com.erudio.restspringbootjavaerudio.greeting;
 
 import lombok.Getter;
 import lombok.Setter;
