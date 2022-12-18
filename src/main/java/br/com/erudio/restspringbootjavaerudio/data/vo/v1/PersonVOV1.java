@@ -7,7 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Getter @Setter
-public class PersonVO implements Serializable {
+public class PersonVOV1 implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -18,10 +18,10 @@ public class PersonVO implements Serializable {
     private String address;
     private String gender;
 
-    public PersonVO() {
+    public PersonVOV1() {
     }
 
-    public PersonVO(Long id, String firstName, String lastName, String address, String gender) {
+    public PersonVOV1(Long id, String firstName, String lastName, String address, String gender) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -49,7 +49,7 @@ public class PersonVO implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        PersonVO other = (PersonVO) obj;
+        PersonVOV1 other = (PersonVOV1) obj;
         if (address == null) {
             if (other.address != null)
                 return false;
