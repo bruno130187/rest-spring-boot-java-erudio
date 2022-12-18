@@ -12,7 +12,7 @@ import static br.com.erudio.restspringbootjavaerudio.converters.NumberConverter.
 public class MathController {
 
     private final AtomicLong counter = new AtomicLong();
-    private SimpleMath simpleMath = new SimpleMath();
+    private final SimpleMath simpleMath = new SimpleMath();
 
     @RequestMapping(value = "/sum/{numOne}/{numTwo}", method = RequestMethod.GET)
     public Double sum(
