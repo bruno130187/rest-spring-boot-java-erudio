@@ -12,9 +12,9 @@ public class ExceptionResponse implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Date timestamp;
-    private String message;
-    private String details;
+    private final Date timestamp;
+    private final String message;
+    private final String details;
 
     public ExceptionResponse(Date timestamp, String message, String details) {
         this.timestamp = timestamp;

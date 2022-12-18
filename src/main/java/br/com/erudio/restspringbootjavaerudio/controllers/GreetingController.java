@@ -19,6 +19,6 @@ public class GreetingController {
                     defaultValue = "Wold")
             String name) {
         return new Greeting(counter.incrementAndGet(), String.format(template, name));
-    };
+    }
 
 }
