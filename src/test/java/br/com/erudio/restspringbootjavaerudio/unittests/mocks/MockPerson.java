@@ -1,6 +1,6 @@
 package br.com.erudio.restspringbootjavaerudio.unittests.mocks;
 
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVO;
+import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVOV1;
 import br.com.erudio.restspringbootjavaerudio.model.Person;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class MockPerson {
         return mockEntity(0);
     }
 
-    public PersonVO mockVO() {
+    public PersonVOV1 mockVO() {
         return mockVO(0);
     }
 
@@ -25,8 +25,8 @@ public class MockPerson {
         return persons;
     }
 
-    public List<PersonVO> mockVOList() {
-        List<PersonVO> persons = new ArrayList<>();
+    public List<PersonVOV1> mockVOList() {
+        List<PersonVOV1> persons = new ArrayList<>();
         for (int i = 0; i < 14; i++) {
             persons.add(mockVO(i));
         }
@@ -43,8 +43,8 @@ public class MockPerson {
         return person;
     }
 
-    public PersonVO mockVO(Integer number) {
-        PersonVO person = new PersonVO();
+    public PersonVOV1 mockVO(Integer number) {
+        PersonVOV1 person = new PersonVOV1();
         person.setAddress("Addres Test" + number);
         person.setFirstName("First Name Test" + number);
         person.setGender(((number % 2)==0) ? "Male" : "Female");
