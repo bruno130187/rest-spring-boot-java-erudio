@@ -63,14 +63,49 @@
 			<artifactId>mssql-jdbc</artifactId>
 			<version>11.2.0.jre18</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-sqlserver</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<configuration>
+					<url>jdbc:sqlserver://localhost:1433;databaseName=rest-spring-boot-erudio;encrypt=false;trustServerCertificate=false</url>
+					<user>sa</user>
+					<password>12345678</password>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.microsoft.sqlserver</groupId>
+						<artifactId>mssql-jdbc</artifactId>
+						<version>11.2.0.jre18</version>
+						<exclusions>
+							<exclusion>
+								<artifactId>slf4j-api</artifactId>
+								<groupId>org.slf4j</groupId>
+							</exclusion>
+						</exclusions>
+					</dependency>
+				</dependencies>
+			</plugin>
+
 		</plugins>
 	</build>
 
