@@ -57,13 +57,13 @@ public class MockPerson {
     }
 
     public PersonVOV1 mockVO(Integer number) {
-        PersonVOV1 person = new PersonVOV1();
-        person.setAddress("Addres Test" + number);
-        person.setFirstName("First Name Test" + number);
-        person.setGender(((number % 2)==0) ? "Male" : "Female");
-        person.setKey(number.longValue());
-        person.setLastName("Last Name Test" + number);
-        return person;
+        PersonVOV1 personVOV1 = new PersonVOV1();
+        personVOV1.setAddress("Addres Test" + number);
+        personVOV1.setFirstName("First Name Test" + number);
+        personVOV1.setGender(((number % 2)==0) ? "Male" : "Female");
+        personVOV1.setKey(number.longValue());
+        personVOV1.setLastName("Last Name Test" + number);
+        return personVOV1;
     }
 
     public PersonVOV2 mockVOV2(Integer number) {
