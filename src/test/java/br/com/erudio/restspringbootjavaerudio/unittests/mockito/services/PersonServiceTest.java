@@ -1,9 +1,7 @@
 package br.com.erudio.restspringbootjavaerudio.unittests.mockito.services;
 
 import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVOV1;
-import br.com.erudio.restspringbootjavaerudio.data.vo.v2.PersonVOV2;
 import br.com.erudio.restspringbootjavaerudio.exceptions.RequiredObjectIsNullException;
-import br.com.erudio.restspringbootjavaerudio.mapper.custom.PersonMapper;
 import br.com.erudio.restspringbootjavaerudio.model.Person;
 import br.com.erudio.restspringbootjavaerudio.repositories.PersonRepository;
 import br.com.erudio.restspringbootjavaerudio.services.PersonService;
@@ -16,9 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.crossstore.ChangeSetPersister;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
