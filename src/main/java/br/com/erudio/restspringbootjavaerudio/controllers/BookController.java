@@ -1,8 +1,6 @@
 package br.com.erudio.restspringbootjavaerudio.controllers;
 
 import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVOV1;
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVOV1;
-import br.com.erudio.restspringbootjavaerudio.data.vo.v2.PersonVOV2;
 import br.com.erudio.restspringbootjavaerudio.services.BookService;
 import br.com.erudio.restspringbootjavaerudio.util.MediaType;
 import io.swagger.v3.oas.annotations.Operation;
