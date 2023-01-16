@@ -1,13 +1,12 @@
 package br.com.erudio.restspringbootjavaerudio.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-@Getter @Setter
+@Data
 @Entity
 @Table(name = "person")
 public class Person implements Serializable {
