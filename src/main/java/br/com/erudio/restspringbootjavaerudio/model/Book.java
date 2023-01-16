@@ -1,8 +1,8 @@
 package br.com.erudio.restspringbootjavaerudio.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serial;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
-@Getter @Setter
+@Data
 @Entity
 @Table(name = "books")
 public class Book implements Serializable {
