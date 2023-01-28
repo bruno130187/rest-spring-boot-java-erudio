@@ -1,16 +1,22 @@
 package br.com.erudio.restspringbootjavaerudio.data.vo.security;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
+@XmlRootElement
 public class AccountCredentialsVO implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
 	private String username;
 	private String password;
+
+	public AccountCredentialsVO(){
+
+	}
 	
 	public AccountCredentialsVO(String username, String password) {
 		this.username = username;

@@ -49,7 +49,7 @@ public class SecurityConfig {
                 (authorize) -> authorize
                         .requestMatchers(
                                 "/auth/signin",
-                                "/auth/refresh",
+                                "/auth/refresh/**",
                                 "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"

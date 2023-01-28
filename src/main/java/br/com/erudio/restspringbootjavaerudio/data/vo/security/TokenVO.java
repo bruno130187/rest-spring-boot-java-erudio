@@ -1,11 +1,13 @@
 package br.com.erudio.restspringbootjavaerudio.data.vo.security;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Data
+@XmlRootElement
 public class TokenVO implements Serializable{
 
 	private static final long serialVersionUID = 1L;

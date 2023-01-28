@@ -7,6 +7,7 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
 
 import java.util.Map;
@@ -20,7 +21,11 @@ public class AbstractIntegrationTest {
         static Network network = Network.newNetwork();
         static MSSQLServerContainer<?> mssqlServerContainer = new MSSQLServerContainer<>("mcr.microsoft.com/mssql/server:2019-latest")
                 .acceptLicense()
-                .withNetwork(network);
+                .withNetwork(network)
+                .withExposedPorts(1433, 1433)
+                .withInitScript("db/mssql-test.sql")
+                .waitingFor(Wait.forLogMessage("*SQL Server is now ready for client connections*", 1))
+                ;
 
         private static void startContainers() {
             Startables.deepStart(Stream.of(mssqlServerContainer)).join();
@@ -28,9 +33,9 @@ public class AbstractIntegrationTest {
 
         private static Map<String, String> createConnectionConfiguration() {
             return Map.of(
-                    "spring.datasource.url", mssqlServerContainer.getJdbcUrl(),
+                    "spring.datasource.url", mssqlServerContainer.getJdbcUrl().concat(";databaseName=rest-spring-boot-erudio;encrypt=false;trustServerCertificate=true;serverTimezone=America/Sao_Paulo"),
                     "spring.datasource.username", mssqlServerContainer.getUsername(),
-                    "spring.datasource.password", mssqlServerContainer.getPassword()
+                    "spring.datasource.password", "A_Str0ng_Required_Password"
             );
         }
 
@@ -43,8 +48,9 @@ public class AbstractIntegrationTest {
                     "testcontainers",
                     (Map) createConnectionConfiguration());
             environment.getPropertySources().addFirst(testcontainers);
-            System.out.println("Waiting 30 seconds!");
-            wait(30000);
+            System.out.println(testcontainers);
+            System.out.println("Waiting 5 seconds!");
+            wait(5000);
         }
 
         public static void wait(int ms) {
@@ -57,4 +63,5 @@ public class AbstractIntegrationTest {
         }
 
     }
+
 }
