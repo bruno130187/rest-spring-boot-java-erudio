@@ -1,10 +1,12 @@
 package br.com.erudio.restspringbootjavaerudio.integrationtests.vo;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
+@XmlRootElement
 public class PersonVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;

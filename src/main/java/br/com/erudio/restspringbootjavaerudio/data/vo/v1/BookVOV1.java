@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import lombok.Data;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
@@ -14,9 +14,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
-@Getter
-@Setter
+@Data
 @JsonPropertyOrder({"id", "author", "launch_date", "price", "priceFormatted", "title"})
+@XmlRootElement
 public class BookVOV1 extends RepresentationModel<BookVOV1> implements Serializable {
 
     @Serial

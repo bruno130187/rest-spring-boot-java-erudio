@@ -3,16 +3,16 @@ package br.com.erudio.restspringbootjavaerudio.data.vo.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import lombok.Data;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-@Getter
-@Setter
+@Data
 @JsonPropertyOrder({"id", "address", "firstName", "lastName", "gender"})
+@XmlRootElement
 public class PersonVOV1 extends RepresentationModel<PersonVOV1> implements Serializable {
 
     @Serial

@@ -26,10 +26,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @Service
 public class JwtTokenProvider {
 
-	@Value("${security.jwt.token.secret-key:secret}")
-	private String secretKey = "secret";
-	
-	@Value("${security.jwt.token.expire-lenght:3600000}")
+	private String secretKey = "53cr37";
+
 	private long validityInMilliseconds = 3600000; // 1h
 	
 	@Autowired
