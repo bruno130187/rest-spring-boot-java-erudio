@@ -1,6 +1,6 @@
 package br.com.erudio.restspringbootjavaerudio.controllers;
 
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVOV1;
+import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVO;
 import br.com.erudio.restspringbootjavaerudio.data.vo.v2.PersonVOV2;
 import br.com.erudio.restspringbootjavaerudio.services.PersonService;
 import br.com.erudio.restspringbootjavaerudio.util.MediaType;
@@ -34,14 +34,14 @@ public class PersonController {
                 @ApiResponse(description = "Success", responseCode = "200",
                         content = {
                             @Content(mediaType = "Application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = PersonVOV1.class)))
+                                    array = @ArraySchema(schema = @Schema(implementation = PersonVO.class)))
                         }),
                 @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                 @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                 @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                 @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             })
-    public List<PersonVOV1> findAll() {
+    public List<PersonVO> findAll() {
         return personService.findAll();
     }
 
@@ -53,14 +53,14 @@ public class PersonController {
             tags = {"People"},
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonVOV1.class))),
+                            content = @Content(schema = @Schema(implementation = PersonVO.class))),
                     @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             })
-    public PersonVOV1 findById(@PathVariable(value = "id") Long id) {
+    public PersonVO findById(@PathVariable(value = "id") Long id) {
         return personService.findById(id);
     }
 
@@ -75,12 +75,12 @@ public class PersonController {
             tags = {"People"},
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonVOV1.class))),
+                            content = @Content(schema = @Schema(implementation = PersonVO.class))),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             })
-    public PersonVOV1 create(@RequestBody PersonVOV1 person) {
+    public PersonVO create(@RequestBody PersonVO person) {
         return personService.create(person);
     }
 
@@ -105,13 +105,13 @@ public class PersonController {
             tags = {"People"},
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = PersonVOV1.class))),
+                            content = @Content(schema = @Schema(implementation = PersonVO.class))),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             })
-    public PersonVOV1 update(@RequestBody PersonVOV1 person) {
+    public PersonVO update(@RequestBody PersonVO person) {
         return personService.update(person);
     }
 
@@ -129,6 +129,26 @@ public class PersonController {
     public ResponseEntity<?> delete(@PathVariable(value = "id") Long id) {
         personService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(value = "/{id}/{enabled}", produces = {MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML,
+            MediaType.APPLICATION_YAML})
+    @Operation(summary = "Disable/Enable a person",
+            description = "Disable/Enable a specific person by your id",
+            tags = {"People"},
+            responses = {
+                    @ApiResponse(description = "Success", responseCode = "200",
+                            content = @Content(schema = @Schema(implementation = PersonVO.class))),
+                    @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
+                    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
+            })
+    public PersonVO disabledPerson(@PathVariable(value = "id") Long id,
+                                   @PathVariable(value = "enabled") Boolean enabled) {
+        return personService.disabledPerson(id, enabled);
     }
 
 }

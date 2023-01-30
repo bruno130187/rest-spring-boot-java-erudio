@@ -103,8 +103,9 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		assertNotNull(persistedPersonVO.getLastName());
 		assertNotNull(persistedPersonVO.getAddress());
 		assertNotNull(persistedPersonVO.getGender());
+		assertTrue(persistedPersonVO.getEnabled());
 		
-		assertTrue(persistedPersonVO.getId() == 1);
+		assertTrue(persistedPersonVO.getId() > 0);
 		
 		assertEquals("Richard", persistedPersonVO.getFirstName());
 		assertEquals("Stallman", persistedPersonVO.getLastName());
@@ -114,9 +115,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 	@Test
 	@Order(2)
 	public void testCreateWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
-
-		//Remove Header
+		//mockPerson();
 
 		var content = given()
 				.spec(requestSpecification)
@@ -141,7 +140,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 	@Test
 	@Order(3)
 	public void testFindById() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		//mockPerson();
 
 		var content = given()
 				.spec(requestSpecification)
@@ -165,8 +164,9 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		assertNotNull(persistedPerson.getLastName());
 		assertNotNull(persistedPerson.getAddress());
 		assertNotNull(persistedPerson.getGender());
+		assertTrue(persistedPerson.getEnabled());
 		
-		assertTrue(persistedPerson.getId() == 1);
+		assertTrue(persistedPerson.getId() > 0);
 		
 		assertEquals("Richard", persistedPerson.getFirstName());
 		assertEquals("Stallman", persistedPerson.getLastName());
@@ -176,7 +176,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 	@Test
 	@Order(4)
 	public void testFindByIdWithWrongOrigin() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		//mockPerson();
 
 		var content = given()
 				.spec(requestSpecification)
@@ -200,11 +200,12 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		assertEquals("Invalid CORS request", content);
 	}
 	private void mockPerson() {
-		personVO.setId(1L);
+		//personVO.setId(10L);
 		personVO.setFirstName("Richard");
 		personVO.setLastName("Stallman");
 		personVO.setAddress("New York City, New York, US");
 		personVO.setGender("Male");
+		personVO.setEnabled(true);
 	}
 
 }

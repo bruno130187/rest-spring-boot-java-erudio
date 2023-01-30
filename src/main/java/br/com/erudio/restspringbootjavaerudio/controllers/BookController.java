@@ -1,6 +1,6 @@
 package br.com.erudio.restspringbootjavaerudio.controllers;
 
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVOV1;
+import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVO;
 import br.com.erudio.restspringbootjavaerudio.services.BookService;
 import br.com.erudio.restspringbootjavaerudio.util.MediaType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,14 +32,14 @@ public class BookController {
                 @ApiResponse(description = "Success", responseCode = "200",
                         content = {
                             @Content(mediaType = "Application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = BookVOV1.class)))
+                                    array = @ArraySchema(schema = @Schema(implementation = BookVO.class)))
                         }),
                 @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                 @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                 @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                 @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             })
-    public List<BookVOV1> findAll() {
+    public List<BookVO> findAll() {
         return bookService.findAll();
     }
 
@@ -51,14 +51,14 @@ public class BookController {
             tags = {"Books"},
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = BookVOV1.class))),
+                            content = @Content(schema = @Schema(implementation = BookVO.class))),
                     @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             })
-    public BookVOV1 findById(@PathVariable(value = "id") Long id) {
+    public BookVO findById(@PathVariable(value = "id") Long id) {
         return bookService.findById(id);
     }
 
@@ -73,13 +73,13 @@ public class BookController {
             tags = {"Books"},
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = BookVOV1.class))),
+                            content = @Content(schema = @Schema(implementation = BookVO.class))),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             })
-    public BookVOV1 create(@RequestBody BookVOV1 bookVOV1) {
-        return bookService.create(bookVOV1);
+    public BookVO create(@RequestBody BookVO bookVO) {
+        return bookService.create(bookVO);
     }
 
     @PutMapping(produces = {MediaType.APPLICATION_JSON,
@@ -93,14 +93,14 @@ public class BookController {
             tags = {"Books"},
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = BookVOV1.class))),
+                            content = @Content(schema = @Schema(implementation = BookVO.class))),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
                     @ApiResponse(description = "Not Found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
             })
-    public BookVOV1 update(@RequestBody BookVOV1 bookVOV1) {
-        return bookService.update(bookVOV1);
+    public BookVO update(@RequestBody BookVO bookVO) {
+        return bookService.update(bookVO);
     }
 
     @DeleteMapping(value = "/{id}")

@@ -17,7 +17,7 @@ import java.util.Objects;
 @Data
 @JsonPropertyOrder({"id", "author", "launch_date", "price", "priceFormatted", "title"})
 @XmlRootElement
-public class BookVOV1 extends RepresentationModel<BookVOV1> implements Serializable {
+public class BookVO extends RepresentationModel<BookVO> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -35,10 +35,10 @@ public class BookVOV1 extends RepresentationModel<BookVOV1> implements Serializa
     private BigDecimal price;
     private String title;
 
-    public BookVOV1() {
+    public BookVO() {
     }
 
-    public BookVOV1(Long key, String author, Date launchDate, BigDecimal price, String priceFormatted, String title) {
+    public BookVO(Long key, String author, Date launchDate, BigDecimal price, String priceFormatted, String title) {
         this.key = key;
         this.author = author;
         this.launchDate = launchDate;
@@ -51,8 +51,8 @@ public class BookVOV1 extends RepresentationModel<BookVOV1> implements Serializa
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        BookVOV1 bookVOV1 = (BookVOV1) o;
-        return key.equals(bookVOV1.key) && author.equals(bookVOV1.author) && launchDate.equals(bookVOV1.launchDate) && price.equals(bookVOV1.price) && title.equals(bookVOV1.title);
+        BookVO bookVO = (BookVO) o;
+        return key.equals(bookVO.key) && author.equals(bookVO.author) && launchDate.equals(bookVO.launchDate) && price.equals(bookVO.price) && title.equals(bookVO.title);
     }
 
     @Override

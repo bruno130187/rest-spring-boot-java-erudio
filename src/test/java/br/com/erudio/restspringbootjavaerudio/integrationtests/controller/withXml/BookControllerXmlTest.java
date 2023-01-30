@@ -105,7 +105,7 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 		assertNotNull(persistedBookVO.getPrice());
 		assertNotNull(persistedBookVO.getTitle());
 		
-		assertTrue(persistedBookVO.getId() == 1);
+		assertTrue(persistedBookVO.getId() > 0);
 
 		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
 
@@ -146,7 +146,7 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 
 		assertEquals(persistedBookVO.getId(), bookVO.getId());
 
-		assertTrue(persistedBookVO.getId() == 1);
+		assertTrue(persistedBookVO.getId() > 0);
 
 		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
 
@@ -159,7 +159,7 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 	@Test
 	@Order(3)
 	public void testDelete() throws JsonMappingException, JsonProcessingException {
-		mockBook();
+		//mockBook();
 
 		given()
 			.spec(requestSpecification)

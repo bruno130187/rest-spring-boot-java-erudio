@@ -1,6 +1,6 @@
 package br.com.erudio.restspringbootjavaerudio.unittests.mocks;
 
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVOV1;
+import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVO;
 import br.com.erudio.restspringbootjavaerudio.model.Book;
 
 import java.math.BigDecimal;
@@ -12,7 +12,7 @@ public class MockBook {
         return mockEntity(0);
     }
 
-    public BookVOV1 mockVO() {
+    public BookVO mockVO() {
         return mockVO(0);
     }
 
@@ -24,8 +24,8 @@ public class MockBook {
         return books;
     }
 
-    public List<BookVOV1> mockVOList() {
-        List<BookVOV1> books = new ArrayList<>();
+    public List<BookVO> mockVOList() {
+        List<BookVO> books = new ArrayList<>();
         for (int i = 0; i < 14; i++) {
             books.add(mockVO(i));
         }
@@ -43,8 +43,8 @@ public class MockBook {
         return book;
     }
 
-    public BookVOV1 mockVO(Integer number) {
-        BookVOV1 book = new BookVOV1();
+    public BookVO mockVO(Integer number) {
+        BookVO book = new BookVO();
         book.setKey(number.longValue());
         book.setAuthor("Author Test" + number);
         GregorianCalendar gc = new GregorianCalendar(2023, 01, 05);

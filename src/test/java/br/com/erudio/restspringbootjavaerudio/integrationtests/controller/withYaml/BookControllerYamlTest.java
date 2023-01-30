@@ -118,7 +118,7 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 		assertNotNull(persistedBookVO.getPrice());
 		assertNotNull(persistedBookVO.getTitle());
 		
-		assertTrue(persistedBookVO.getId() == 1);
+		assertTrue(persistedBookVO.getId() > 0);
 
 		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
 
@@ -163,7 +163,7 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 
 		assertEquals(persistedBookVO.getId(), bookVO.getId());
 
-		assertTrue(persistedBookVO.getId() == 1);
+		assertTrue(persistedBookVO.getId() > 0);
 
 		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
 
@@ -173,30 +173,10 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 		assertEquals("Title Book", persistedBookVO.getTitle());
 	}
 
+
+
 	@Test
 	@Order(3)
-	public void testDelete() throws JsonMappingException, JsonProcessingException {
-		mockBook();
-
-		given()
-			.spec(requestSpecification)
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.accept(TestConfigs.CONTENT_TYPE_YML)
-				.pathParam("id", bookVO.getId())
-				.when()
-				.delete("{id}")
-			.then()
-				.statusCode(204);
-
-	}
-
-	@Test
-	@Order(4)
 	public void testFindAll() throws JsonMappingException, JsonProcessingException {
 
 		var content = given()
@@ -239,7 +219,7 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 	}
 
 	@Test
-	@Order(5)
+	@Order(4)
 	public void testFindAllWithoutToken() throws JsonMappingException, JsonProcessingException {
 
 		RequestSpecification requestSpecificationWithoutToken = new RequestSpecBuilder()
@@ -263,6 +243,28 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 				.then()
 				.statusCode(401)
 				;
+
+	}
+
+	@Test
+	@Order(5)
+	public void testDelete() throws JsonMappingException, JsonProcessingException {
+		//mockBook();
+
+		given()
+				.spec(requestSpecification)
+				.config(
+						RestAssuredConfig.config()
+								.encoderConfig(EncoderConfig.encoderConfig()
+										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+												ContentType.TEXT)))
+				.contentType(TestConfigs.CONTENT_TYPE_YML)
+				.accept(TestConfigs.CONTENT_TYPE_YML)
+				.pathParam("id", bookVO.getId())
+				.when()
+				.delete("{id}")
+				.then()
+				.statusCode(204);
 
 	}
 

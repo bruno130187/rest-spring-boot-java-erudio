@@ -1,6 +1,6 @@
 package br.com.erudio.restspringbootjavaerudio.unittests.mocks;
 
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVOV1;
+import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVO;
 import br.com.erudio.restspringbootjavaerudio.data.vo.v2.PersonVOV2;
 import br.com.erudio.restspringbootjavaerudio.model.Person;
 
@@ -14,7 +14,7 @@ public class MockPerson {
         return mockEntity(0);
     }
 
-    public PersonVOV1 mockVO() {
+    public PersonVO mockVO() {
         return mockVO(0);
     }
 
@@ -30,8 +30,8 @@ public class MockPerson {
         return persons;
     }
 
-    public List<PersonVOV1> mockVOList() {
-        List<PersonVOV1> persons = new ArrayList<>();
+    public List<PersonVO> mockVOList() {
+        List<PersonVO> persons = new ArrayList<>();
         for (int i = 0; i < 14; i++) {
             persons.add(mockVO(i));
         }
@@ -53,17 +53,19 @@ public class MockPerson {
         person.setGender(((number % 2)==0) ? "Male" : "Female");
         person.setId(number.longValue());
         person.setLastName("Last Name Test" + number);
+        person.setEnabled(((number % 2)==0) ? true : false);
         return person;
     }
 
-    public PersonVOV1 mockVO(Integer number) {
-        PersonVOV1 personVOV1 = new PersonVOV1();
-        personVOV1.setAddress("Addres Test" + number);
-        personVOV1.setFirstName("First Name Test" + number);
-        personVOV1.setGender(((number % 2)==0) ? "Male" : "Female");
-        personVOV1.setKey(number.longValue());
-        personVOV1.setLastName("Last Name Test" + number);
-        return personVOV1;
+    public PersonVO mockVO(Integer number) {
+        PersonVO personVO = new PersonVO();
+        personVO.setAddress("Addres Test" + number);
+        personVO.setFirstName("First Name Test" + number);
+        personVO.setGender(((number % 2)==0) ? "Male" : "Female");
+        personVO.setKey(number.longValue());
+        personVO.setLastName("Last Name Test" + number);
+        personVO.setEnabled(((number % 2)==0) ? true : false);
+        return personVO;
     }
 
     public PersonVOV2 mockVOV2(Integer number) {
@@ -74,6 +76,7 @@ public class MockPerson {
         person.setKey(number.longValue());
         person.setLastName("Last Name Test" + number);
         person.setBirthday(new Date());
+        person.setEnabled(((number % 2)==0) ? true : false);
         return person;
     }
 
