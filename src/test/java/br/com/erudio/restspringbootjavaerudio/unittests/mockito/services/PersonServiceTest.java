@@ -1,12 +1,13 @@
 package br.com.erudio.restspringbootjavaerudio.unittests.mockito.services;
 
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVOV1;
+import br.com.erudio.restspringbootjavaerudio.data.vo.v1.PersonVO;
 import br.com.erudio.restspringbootjavaerudio.exceptions.RequiredObjectIsNullException;
 import br.com.erudio.restspringbootjavaerudio.model.Person;
 import br.com.erudio.restspringbootjavaerudio.repositories.PersonRepository;
 import br.com.erudio.restspringbootjavaerudio.services.PersonService;
 import br.com.erudio.restspringbootjavaerudio.unittests.mocks.MockPerson;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.hateoas.IanaLinkRelations;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,21 +44,22 @@ class PersonServiceTest {
     }
 
     @Test
+    @Order(1)
     void create() {
         Person person = mockPerson.mockEntity(1);
         Person persisted = person;
         persisted.setId(1L);
 
-        PersonVOV1 personVOV1 = mockPerson.mockVO(1);
-        personVOV1.setKey(1L);
+        PersonVO personVO = mockPerson.mockVO(1);
+        personVO.setKey(1L);
         when(personRepository.save(person)).thenReturn(persisted);
 
-        var result = personService.create(personVOV1);
+        var result = personService.create(personVO);
         assertNotNull(result);
         assertNotNull(result.getKey());
         assertNotNull(result.getLinks());
 
-        assertTrue(result.toString().contains("links: [</api/person/v1/1>;rel=\"self\"]"));
+        assertTrue(String.valueOf(result.getRequiredLink(IanaLinkRelations.SELF.value())).contains("</api/person/v1/1>;rel=\"self\""));
         assertEquals("Addres Test1", result.getAddress());
         assertEquals("First Name Test1", result.getFirstName());
         assertEquals("Last Name Test1", result.getLastName());
@@ -64,6 +67,7 @@ class PersonServiceTest {
     }
 
     @Test
+    @Order(2)
     void testCreateWithNullPerson() {
         Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> {
             personService.create(null);
@@ -74,10 +78,12 @@ class PersonServiceTest {
     }
 
     @Test
+    @Order(3)
     void createV2() {
 
     }
     @Test
+    @Order(4)
     void update() {
         Person person = mockPerson.mockEntity(1);
         person.setId(1L);
@@ -85,18 +91,18 @@ class PersonServiceTest {
         Person persisted = person;
         persisted.setId(1L);
 
-        PersonVOV1 personVOV1 = mockPerson.mockVO(1);
-        personVOV1.setKey(1L);
+        PersonVO personVO = mockPerson.mockVO(1);
+        personVO.setKey(1L);
 
         when(personRepository.findById(1L)).thenReturn(Optional.of(person));
         when(personRepository.save(person)).thenReturn(persisted);
 
-        var result = personService.update(personVOV1);
+        var result = personService.update(personVO);
         assertNotNull(result);
         assertNotNull(result.getKey());
         assertNotNull(result.getLinks());
 
-        assertTrue(result.toString().contains("links: [</api/person/v1/1>;rel=\"self\"]"));
+        assertTrue(String.valueOf(result.getRequiredLink(IanaLinkRelations.SELF.value())).contains("</api/person/v1/1>;rel=\"self\""));
         assertEquals("Addres Test1", result.getAddress());
         assertEquals("First Name Test1", result.getFirstName());
         assertEquals("Last Name Test1", result.getLastName());
@@ -104,6 +110,7 @@ class PersonServiceTest {
     }
 
     @Test
+    @Order(5)
     void testUpdateWithNullPerson() {
         Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> {
             personService.update(null);
@@ -114,57 +121,7 @@ class PersonServiceTest {
     }
 
     @Test
-    void delete() {
-        Person person = mockPerson.mockEntity(1);
-        person.setId(1L);
-        when(personRepository.findById(1L)).thenReturn(Optional.of(person));
-        personService.delete(1L);
-    }
-
-    @Test
-    void findAll() {
-        List<Person> personList = mockPerson.mockEntityList();
-
-        when(personRepository.findAll()).thenReturn(personList);
-        var people = personService.findAll();
-        assertNotNull(people);
-        assertEquals(14, people.size());
-
-        var personVOV1one = people.get(1);
-        assertNotNull(personVOV1one);
-        assertNotNull(personVOV1one.getKey());
-        assertNotNull(personVOV1one.getLinks());
-
-        assertTrue(personVOV1one.toString().contains("links: [</api/person/v1/1>;rel=\"self\"]"));
-        assertEquals("Addres Test1", personVOV1one.getAddress());
-        assertEquals("First Name Test1", personVOV1one.getFirstName());
-        assertEquals("Last Name Test1", personVOV1one.getLastName());
-        assertEquals("Female", personVOV1one.getGender());
-
-        var personVOV1four = people.get(4);
-        assertNotNull(personVOV1four);
-        assertNotNull(personVOV1four.getKey());
-        assertNotNull(personVOV1four.getLinks());
-
-        assertTrue(personVOV1four.toString().contains("links: [</api/person/v1/4>;rel=\"self\"]"));
-        assertEquals("Addres Test4", personVOV1four.getAddress());
-        assertEquals("First Name Test4", personVOV1four.getFirstName());
-        assertEquals("Last Name Test4", personVOV1four.getLastName());
-        assertEquals("Male", personVOV1four.getGender());
-
-        var personVOV1seven = people.get(7);
-        assertNotNull(personVOV1seven);
-        assertNotNull(personVOV1seven.getKey());
-        assertNotNull(personVOV1seven.getLinks());
-
-        assertTrue(personVOV1seven.toString().contains("links: [</api/person/v1/7>;rel=\"self\"]"));
-        assertEquals("Addres Test7", personVOV1seven.getAddress());
-        assertEquals("First Name Test7", personVOV1seven.getFirstName());
-        assertEquals("Last Name Test7", personVOV1seven.getLastName());
-        assertEquals("Female", personVOV1seven.getGender());
-    }
-
-    @Test
+    @Order(6)
     void findById() {
         Person person = mockPerson.mockEntity(1);
         person.setId(1L);
@@ -174,10 +131,63 @@ class PersonServiceTest {
         assertNotNull(result.getKey());
         assertNotNull(result.getLinks());
 
-        assertTrue(result.toString().contains("links: [</api/person/v1/1>;rel=\"self\"]"));
+        assertTrue(String.valueOf(result.getRequiredLink(IanaLinkRelations.SELF.value())).contains("</api/person/v1/1>;rel=\"self\""));
         assertEquals("Addres Test1", result.getAddress());
         assertEquals("First Name Test1", result.getFirstName());
         assertEquals("Last Name Test1", result.getLastName());
         assertEquals("Female", result.getGender());
+    }
+
+    @Test
+    @Order(7)
+    void findAll() {
+        List<Person> personList = mockPerson.mockEntityList();
+
+        when(personRepository.findAll()).thenReturn(personList);
+        var people = personService.findAll();
+        assertNotNull(people);
+        assertEquals(14, people.size());
+
+        var personVOone = people.get(1);
+        assertNotNull(personVOone);
+        assertNotNull(personVOone.getKey());
+        assertNotNull(personVOone.getLinks());
+
+        assertTrue(String.valueOf(personVOone.getRequiredLink(IanaLinkRelations.SELF.value())).contains("</api/person/v1/1>;rel=\"self\""));
+        assertEquals("Addres Test1", personVOone.getAddress());
+        assertEquals("First Name Test1", personVOone.getFirstName());
+        assertEquals("Last Name Test1", personVOone.getLastName());
+        assertEquals("Female", personVOone.getGender());
+
+        var personVOfour = people.get(4);
+        assertNotNull(personVOfour);
+        assertNotNull(personVOfour.getKey());
+        assertNotNull(personVOfour.getLinks());
+
+        assertTrue(String.valueOf(personVOfour.getRequiredLink(IanaLinkRelations.SELF.value())).contains("</api/person/v1/4>;rel=\"self\""));
+        assertEquals("Addres Test4", personVOfour.getAddress());
+        assertEquals("First Name Test4", personVOfour.getFirstName());
+        assertEquals("Last Name Test4", personVOfour.getLastName());
+        assertEquals("Male", personVOfour.getGender());
+
+        var personVOseven = people.get(7);
+        assertNotNull(personVOseven);
+        assertNotNull(personVOseven.getKey());
+        assertNotNull(personVOseven.getLinks());
+
+        assertTrue(String.valueOf(personVOseven.getRequiredLink(IanaLinkRelations.SELF.value())).contains("</api/person/v1/7>;rel=\"self\""));
+        assertEquals("Addres Test7", personVOseven.getAddress());
+        assertEquals("First Name Test7", personVOseven.getFirstName());
+        assertEquals("Last Name Test7", personVOseven.getLastName());
+        assertEquals("Female", personVOseven.getGender());
+    }
+
+    @Test
+    @Order(8)
+    void delete() {
+        Person person = mockPerson.mockEntity(1);
+        person.setId(1L);
+        when(personRepository.findById(1L)).thenReturn(Optional.of(person));
+        personService.delete(1L);
     }
 }

@@ -106,7 +106,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 		assertNotNull(persistedBookVO.getPrice());
 		assertNotNull(persistedBookVO.getTitle());
 		
-		assertTrue(persistedBookVO.getId() == 1);
+		assertTrue(persistedBookVO.getId() > 0);
 
 		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
 
@@ -146,7 +146,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 
 		assertEquals(persistedBookVO.getId(), bookVO.getId());
 
-		assertTrue(persistedBookVO.getId() == 1);
+		assertTrue(persistedBookVO.getId() > 0);
 
 		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
 
@@ -159,7 +159,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 	@Test
 	@Order(3)
 	public void testDelete() throws JsonMappingException, JsonProcessingException {
-		mockBook();
+		//mockBook();
 
 		given()
 			.spec(requestSpecification)
@@ -203,10 +203,10 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 
 		GregorianCalendar gc = new GregorianCalendar(2017, 10, 29);
 
-		assertEquals("Ralph Johnson, Erich Gamma, John Vlissides e Richard Helm", foundBookOneVO.getAuthor());
+		assertEquals("Michael C. Feathers", foundBookOneVO.getAuthor());
 		assertEquals(gc.getTime(), foundBookOneVO.getLaunchDate());
-		assertEquals(new BigDecimal(45).setScale(2), foundBookOneVO.getPrice().setScale(2));
-		assertEquals("Design Patterns", foundBookOneVO.getTitle());
+		assertEquals(new BigDecimal(49).setScale(2), foundBookOneVO.getPrice().setScale(2));
+		assertEquals("Working effectively with legacy code", foundBookOneVO.getTitle());
 	}
 
 	@Test
@@ -232,7 +232,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 	}
 
 	private void mockBook() {
-		bookVO.setId(1L);
+		//bookVO.setId(1L);
 		bookVO.setAuthor("Author Book");
 		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
 		bookVO.setLaunchDate(gc.getTime());

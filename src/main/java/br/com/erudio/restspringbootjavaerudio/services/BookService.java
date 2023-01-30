@@ -1,7 +1,7 @@
 package br.com.erudio.restspringbootjavaerudio.services;
 
 import br.com.erudio.restspringbootjavaerudio.controllers.BookController;
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVOV1;
+import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVO;
 import br.com.erudio.restspringbootjavaerudio.exceptions.RequiredObjectIsNullException;
 import br.com.erudio.restspringbootjavaerudio.exceptions.ResourceNotFoundException;
 import br.com.erudio.restspringbootjavaerudio.mapper.DozerMapper;
@@ -27,24 +27,24 @@ public class BookService {
     @Autowired
     BookMapper bookMapper;
 
-    public BookVOV1 create(BookVOV1 bookVOV1) {
-        if (bookVOV1 == null) throw new RequiredObjectIsNullException();
+    public BookVO create(BookVO bookVO) {
+        if (bookVO == null) throw new RequiredObjectIsNullException();
         logger.info("Creating one Person!");
-        var entity = DozerMapper.parseObject(bookVOV1, Book.class);
-        var vo =  DozerMapper.parseObject(bookRepository.save(entity), BookVOV1.class);
+        var entity = DozerMapper.parseObject(bookVO, Book.class);
+        var vo =  DozerMapper.parseObject(bookRepository.save(entity), BookVO.class);
         vo.add(linkTo(methodOn(BookController.class).findById(vo.getKey())).withSelfRel());
         return vo;
     }
 
-    public BookVOV1 update(BookVOV1 bookVOV1) {
-        if (bookVOV1 == null) throw new RequiredObjectIsNullException();
+    public BookVO update(BookVO bookVO) {
+        if (bookVO == null) throw new RequiredObjectIsNullException();
         logger.info("Updating one Book!");
-        var entity = bookRepository.findById(bookVOV1.getKey()).orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
-        entity.setAuthor(bookVOV1.getAuthor());
-        entity.setLaunchDate(bookVOV1.getLaunchDate());
-        entity.setPrice(bookVOV1.getPrice());
-        entity.setTitle(bookVOV1.getTitle());
-        var vo =  DozerMapper.parseObject(bookRepository.save(entity), BookVOV1.class);
+        var entity = bookRepository.findById(bookVO.getKey()).orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
+        entity.setAuthor(bookVO.getAuthor());
+        entity.setLaunchDate(bookVO.getLaunchDate());
+        entity.setPrice(bookVO.getPrice());
+        entity.setTitle(bookVO.getTitle());
+        var vo =  DozerMapper.parseObject(bookRepository.save(entity), BookVO.class);
         vo.add(linkTo(methodOn(BookController.class).findById(vo.getKey())).withSelfRel());
         return vo;
     }
@@ -55,17 +55,17 @@ public class BookService {
         bookRepository.delete(entity);
     }
 
-    public List<BookVOV1> findAll() {
+    public List<BookVO> findAll() {
         logger.info("Finding all Books!");
-        var booksVOV1 = DozerMapper.parseListObjects(bookRepository.findAll(), BookVOV1.class);
+        var booksVOV1 = DozerMapper.parseListObjects(bookRepository.findAll(), BookVO.class);
         booksVOV1.stream().forEach(p -> p.add(linkTo(methodOn(BookController.class).findById(p.getKey())).withSelfRel()));
         return booksVOV1;
     }
 
-    public BookVOV1 findById(Long id) {
+    public BookVO findById(Long id) {
         logger.info("Finding one Book!");
         var entity = bookRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
-        var vo = DozerMapper.parseObject(entity, BookVOV1.class);
+        var vo = DozerMapper.parseObject(entity, BookVO.class);
         vo.add(linkTo(methodOn(BookController.class).findById(id)).withSelfRel());
         return vo;
     }

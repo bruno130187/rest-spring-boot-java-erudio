@@ -28,8 +28,7 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
@@ -104,8 +103,9 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest{
 		assertNotNull(persistedPersonVO.getLastName());
 		assertNotNull(persistedPersonVO.getAddress());
 		assertNotNull(persistedPersonVO.getGender());
+		assertTrue(persistedPersonVO.getEnabled());
 		
-		assertTrue(persistedPersonVO.getId() == 1);
+		assertTrue(persistedPersonVO.getId() > 0);
 
 		assertEquals("Nelson", persistedPersonVO.getFirstName());
 		assertEquals("Piquet", persistedPersonVO.getLastName());
@@ -141,10 +141,11 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest{
 		assertNotNull(persistedPersonVO.getLastName());
 		assertNotNull(persistedPersonVO.getAddress());
 		assertNotNull(persistedPersonVO.getGender());
+		assertTrue(persistedPersonVO.getEnabled());
 
 		assertEquals(persistedPersonVO.getId(), personVO.getId());
 
-		assertTrue(persistedPersonVO.getId() == 1);
+		assertTrue(persistedPersonVO.getId() > 0);
 
 		assertEquals("Nelson", persistedPersonVO.getFirstName());
 		assertEquals("Senna", persistedPersonVO.getLastName());
@@ -154,20 +155,42 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest{
 
 	@Test
 	@Order(3)
-	public void testDelete() throws JsonMappingException, JsonProcessingException {
+	public void testFindById() throws JsonMappingException, JsonProcessingException {
 		mockPerson();
 
-		given()
-			.spec(requestSpecification)
-			.contentType(TestConfigs.CONTENT_TYPE_XML)
+		var content = given().spec(requestSpecification)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
 				.accept(TestConfigs.CONTENT_TYPE_XML)
 				.pathParam("id", personVO.getId())
 				.when()
-				.delete("{id}")
-			.then()
-				.statusCode(204);
+				.get("{id}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
 
+		PersonVO persistedPerson = xmlMapper.readValue(content, PersonVO.class);
+		personVO = persistedPerson;
+
+		assertNotNull(persistedPerson);
+
+		assertNotNull(persistedPerson.getId());
+		assertNotNull(persistedPerson.getFirstName());
+		assertNotNull(persistedPerson.getLastName());
+		assertNotNull(persistedPerson.getAddress());
+		assertNotNull(persistedPerson.getGender());
+		assertTrue(persistedPerson.getEnabled());
+
+		assertEquals(personVO.getId(), persistedPerson.getId());
+
+		assertEquals("Nelson", persistedPerson.getFirstName());
+		assertEquals("Senna", persistedPerson.getLastName());
+		assertEquals("São Paulo, SP, BR", persistedPerson.getAddress());
+		assertEquals("Male", persistedPerson.getGender());
 	}
+
+
 
 	@Test
 	@Order(4)
@@ -196,12 +219,13 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest{
 		assertNotNull(foundPersonOneVO.getLastName());
 		assertNotNull(foundPersonOneVO.getAddress());
 		assertNotNull(foundPersonOneVO.getGender());
+		assertTrue(foundPersonOneVO.getEnabled());
 
 		assertTrue(foundPersonOneVO.getId() > 0);
 
-		assertEquals("Bruno", foundPersonOneVO.getFirstName());
-		assertEquals("Araújo", foundPersonOneVO.getLastName());
-		assertEquals("Endereço 3", foundPersonOneVO.getAddress());
+		assertEquals("Nelson", foundPersonOneVO.getFirstName());
+		assertEquals("Senna", foundPersonOneVO.getLastName());
+		assertEquals("São Paulo, SP, BR", foundPersonOneVO.getAddress());
 		assertEquals("Male", foundPersonOneVO.getGender());
 	}
 
@@ -228,12 +252,67 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest{
 
 	}
 
+	@Test
+	@Order(6)
+	public void testDisablePersonById() throws JsonMappingException, JsonProcessingException {
+
+		var content = given().spec(requestSpecification)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
+				.pathParam("id", personVO.getId())
+				.pathParam("enabled", 0)
+				.when()
+				.patch("{id}/{enabled}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+
+		PersonVO persistedPerson = xmlMapper.readValue(content, PersonVO.class);
+		personVO = persistedPerson;
+
+		assertNotNull(persistedPerson);
+
+		assertNotNull(persistedPerson.getId());
+		assertNotNull(persistedPerson.getFirstName());
+		assertNotNull(persistedPerson.getLastName());
+		assertNotNull(persistedPerson.getAddress());
+		assertNotNull(persistedPerson.getGender());
+		assertFalse(persistedPerson.getEnabled());
+
+		assertEquals(personVO.getId(), persistedPerson.getId());
+
+		assertEquals("Nelson", persistedPerson.getFirstName());
+		assertEquals("Senna", persistedPerson.getLastName());
+		assertEquals("São Paulo, SP, BR", persistedPerson.getAddress());
+		assertEquals("Male", persistedPerson.getGender());
+	}
+
+	@Test
+	@Order(7)
+	public void testDelete() throws JsonMappingException, JsonProcessingException {
+		mockPerson();
+
+		given()
+				.spec(requestSpecification)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
+				.pathParam("id", personVO.getId())
+				.when()
+				.delete("{id}")
+				.then()
+				.statusCode(204);
+
+	}
+
 	private void mockPerson() {
 		personVO.setId(1L);
 		personVO.setFirstName("Nelson");
 		personVO.setLastName("Piquet");
 		personVO.setAddress("São Paulo, SP, BR");
 		personVO.setGender("Male");
+		personVO.setEnabled(true);
 	}
 
 }

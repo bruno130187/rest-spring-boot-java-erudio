@@ -1,6 +1,6 @@
 package br.com.erudio.restspringbootjavaerudio.unittests.mockito.services;
 
-import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVOV1;
+import br.com.erudio.restspringbootjavaerudio.data.vo.v1.BookVO;
 import br.com.erudio.restspringbootjavaerudio.exceptions.RequiredObjectIsNullException;
 import br.com.erudio.restspringbootjavaerudio.model.Book;
 import br.com.erudio.restspringbootjavaerudio.repositories.BookRepository;
@@ -14,9 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.hateoas.IanaLinkRelations;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
@@ -45,16 +45,16 @@ class BookServiceTest {
         Book persisted = book;
         persisted.setId(1L);
 
-        BookVOV1 bookVOV1 = mockBook.mockVO(1);
-        bookVOV1.setKey(1L);
+        BookVO bookVO = mockBook.mockVO(1);
+        bookVO.setKey(1L);
         when(bookRepository.save(book)).thenReturn(persisted);
 
-        var result = bookService.create(bookVOV1);
+        var result = bookService.create(bookVO);
         assertNotNull(result);
         assertNotNull(result.getKey());
         assertNotNull(result.getLinks());
 
-        assertTrue(result.toString().contains("links: [</api/book/v1/1>;rel=\"self\"]"));
+        assertTrue(result.getLinks().toString().contains("</api/book/v1/1>;rel=\"self\""));
         assertEquals("Author Test1", result.getAuthor());
         GregorianCalendar gc = new GregorianCalendar(2023, 01, 05);
         assertEquals(gc.getTime(), result.getLaunchDate());
@@ -80,18 +80,18 @@ class BookServiceTest {
         Book persisted = book;
         persisted.setId(1L);
 
-        BookVOV1 bookVOV1 = mockBook.mockVO(1);
-        bookVOV1.setKey(1L);
+        BookVO bookVO = mockBook.mockVO(1);
+        bookVO.setKey(1L);
 
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(persisted);
 
-        var result = bookService.update(bookVOV1);
+        var result = bookService.update(bookVO);
         assertNotNull(result);
         assertNotNull(result.getKey());
         assertNotNull(result.getLinks());
 
-        assertTrue(result.toString().contains("links: [</api/book/v1/1>;rel=\"self\"]"));
+        assertTrue(String.valueOf(result.getRequiredLink(IanaLinkRelations.SELF.value())).contains("</api/book/v1/1>;rel=\"self\""));
         assertEquals("Author Test1", result.getAuthor());
         GregorianCalendar gc = new GregorianCalendar(2023, 01, 05);
         assertEquals(gc.getTime(), result.getLaunchDate());
@@ -131,7 +131,7 @@ class BookServiceTest {
         assertNotNull(bookVOV1one.getKey());
         assertNotNull(bookVOV1one.getLinks());
 
-        assertTrue(bookVOV1one.toString().contains("links: [</api/book/v1/1>;rel=\"self\"]"));
+        assertTrue(bookVOV1one.getLinks().toString().contains("</api/book/v1/1>;rel=\"self\""));
         assertEquals("Author Test1", bookVOV1one.getAuthor());
         assertEquals(gc.getTime(), bookVOV1one.getLaunchDate());
         assertEquals(BigDecimal.TEN, bookVOV1one.getPrice());
@@ -142,7 +142,7 @@ class BookServiceTest {
         assertNotNull(bookVOV1four.getKey());
         assertNotNull(bookVOV1four.getLinks());
 
-        assertTrue(bookVOV1four.toString().contains("links: [</api/book/v1/4>;rel=\"self\"]"));
+        assertTrue(bookVOV1four.getLinks().toString().contains("</api/book/v1/4>;rel=\"self\""));
         assertEquals("Author Test4", bookVOV1four.getAuthor());
         assertEquals(gc.getTime(), bookVOV1four.getLaunchDate());
         assertEquals(BigDecimal.TEN, bookVOV1four.getPrice());
@@ -153,7 +153,7 @@ class BookServiceTest {
         assertNotNull(bookVOV1seven.getKey());
         assertNotNull(bookVOV1seven.getLinks());
 
-        assertTrue(bookVOV1seven.toString().contains("links: [</api/book/v1/7>;rel=\"self\"]"));
+        assertTrue(bookVOV1seven.getLinks().toString().contains("</api/book/v1/7>;rel=\"self\""));
         assertEquals("Author Test7", bookVOV1seven.getAuthor());
         assertEquals(gc.getTime(), bookVOV1seven.getLaunchDate());
         assertEquals(BigDecimal.TEN, bookVOV1seven.getPrice());

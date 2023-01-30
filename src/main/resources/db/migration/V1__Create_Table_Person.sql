@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[person](
     [address] [varchar](200) NOT NULL,
     [gender] [varchar](10) NOT NULL);
 
-SET IDENTITY_INSERT [dbo].[person] ON;
+SET IDENTITY_INSERT [dbo].[person] OFF;
 
 
 
