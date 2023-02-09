@@ -5,8 +5,9 @@ import br.com.erudio.restspringbootjavaerudio.data.vo.security.AccountCredential
 import br.com.erudio.restspringbootjavaerudio.data.vo.security.TokenVO;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.BookVO;
+import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.PersonVO;
+import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.wrapper.WrapperBookVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,12 +26,10 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
@@ -105,6 +104,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 		assertNotNull(persistedBookVO.getLaunchDate());
 		assertNotNull(persistedBookVO.getPrice());
 		assertNotNull(persistedBookVO.getTitle());
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8090/api/book/v1/16\""));
 		
 		assertTrue(persistedBookVO.getId() > 0);
 
@@ -143,6 +143,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 		assertNotNull(persistedBookVO.getLaunchDate());
 		assertNotNull(persistedBookVO.getPrice());
 		assertNotNull(persistedBookVO.getTitle());
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8090/api/book/v1/16\""));
 
 		assertEquals(persistedBookVO.getId(), bookVO.getId());
 
@@ -158,18 +159,44 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 
 	@Test
 	@Order(3)
-	public void testDelete() throws JsonMappingException, JsonProcessingException {
+	public void testFindById() throws JsonMappingException, JsonProcessingException {
 		//mockBook();
 
-		given()
-			.spec(requestSpecification)
-			.contentType(TestConfigs.CONTENT_TYPE_JSON)
+		var content = given().spec(requestSpecification)
+				.contentType(TestConfigs.CONTENT_TYPE_JSON)
 				.pathParam("id", bookVO.getId())
 				.when()
-				.delete("{id}")
-			.then()
-				.statusCode(204);
+				.get("{id}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
 
+		BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
+		bookVO = persistedBook;
+
+		assertNotNull(persistedBook);
+
+		assertNotNull(persistedBook.getId());
+		assertNotNull(persistedBook.getId());
+		assertNotNull(persistedBook.getAuthor());
+		assertNotNull(persistedBook.getLaunchDate());
+		assertNotNull(persistedBook.getPrice());
+		assertNotNull(persistedBook.getTitle());
+		assertTrue(persistedBook.getEnabled());
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8090/api/book/v1/16\""));
+
+		assertEquals(bookVO.getId(), persistedBook.getId());
+
+		assertTrue(persistedBook.getId() > 0);
+
+		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
+
+		assertEquals("Author Book Updated", persistedBook.getAuthor());
+		assertEquals(gc.getTime(), persistedBook.getLaunchDate());
+		assertEquals(new BigDecimal(10).setScale(2), persistedBook.getPrice().setScale(2));
+		assertEquals("Title Book", persistedBook.getTitle());
 	}
 
 	@Test
@@ -179,6 +206,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 		var content = given()
 				.spec(requestSpecification)
 				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.queryParams("page", 0, "size", 10, "direction", "asc")
 				.when()
 				.get()
 				.then()
@@ -188,8 +216,9 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 				.asString()
 		;
 
-		List<BookVO> persistedBookVO = objectMapper.readValue(content, new TypeReference<List<BookVO>>(){});
-		BookVO foundBookOneVO = persistedBookVO.get(0);
+		WrapperBookVO wrapperBookVO = objectMapper.readValue(content, WrapperBookVO.class);
+		var books = wrapperBookVO.getEmbedded().getBooks();
+		BookVO foundBookOneVO = books.get(0);
 
 		assertNotNull(foundBookOneVO);
 
@@ -198,6 +227,8 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 		assertNotNull(foundBookOneVO.getLaunchDate());
 		assertNotNull(foundBookOneVO.getPrice());
 		assertNotNull(foundBookOneVO.getTitle());
+		assertTrue(foundBookOneVO.getEnabled());
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8090/api/book/v1/1\""));
 
 		assertTrue(foundBookOneVO.getId() > 0);
 
@@ -211,6 +242,47 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 
 	@Test
 	@Order(5)
+	public void testFindByTitle() throws JsonMappingException, JsonProcessingException {
+		//mockBook();
+
+		var content = given().spec(requestSpecification)
+				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.pathParam("title", "code")
+				.queryParams("page", 0, "size", 10, "direction", "asc")
+				.when()
+				.get("findBooksByTitle/{title}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+
+		WrapperBookVO wrapperBookVO = objectMapper.readValue(content, WrapperBookVO.class);
+		var books = wrapperBookVO.getEmbedded().getBooks();
+		BookVO foundBookOneVO = books.get(0);
+
+		assertNotNull(foundBookOneVO);
+
+		assertNotNull(foundBookOneVO.getId());
+		assertNotNull(foundBookOneVO.getAuthor());
+		assertNotNull(foundBookOneVO.getLaunchDate());
+		assertNotNull(foundBookOneVO.getPrice());
+		assertNotNull(foundBookOneVO.getTitle());
+		assertTrue(foundBookOneVO.getEnabled());
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8090/api/book/v1/1\""));
+
+		assertTrue(foundBookOneVO.getId() > 0);
+
+		GregorianCalendar gc = new GregorianCalendar(2009, 00, 10);
+
+		assertEquals("Robert C. Martin", foundBookOneVO.getAuthor());
+		assertEquals(gc.getTime(), foundBookOneVO.getLaunchDate());
+		assertEquals(new BigDecimal(77).setScale(2), foundBookOneVO.getPrice().setScale(2));
+		assertEquals("Clean Code", foundBookOneVO.getTitle());
+	}
+
+	@Test
+	@Order(6)
 	public void testFindAllWithoutToken() throws JsonMappingException, JsonProcessingException {
 
 		RequestSpecification requestSpecificationWithoutToken = new RequestSpecBuilder()
@@ -231,6 +303,85 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 
 	}
 
+	@Test
+	@Order(7)
+	public void testDisableBookById() throws JsonMappingException, JsonProcessingException {
+
+		var content = given().spec(requestSpecification)
+				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.pathParam("id", bookVO.getId())
+				.pathParam("enabled", 0)
+				.when()
+				.patch("{id}/{enabled}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+
+		BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
+		bookVO = persistedBook;
+
+		assertNotNull(persistedBook);
+
+		assertNotNull(persistedBook.getId());
+		assertNotNull(persistedBook.getAuthor());
+		assertNotNull(persistedBook.getLaunchDate());
+		assertNotNull(persistedBook.getPrice());
+		assertNotNull(persistedBook.getTitle());
+		assertFalse(persistedBook.getEnabled());
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8090/api/book/v1/16\""));
+
+		assertEquals(bookVO.getId(), persistedBook.getId());
+
+		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
+
+		assertEquals("Author Book Updated", persistedBook.getAuthor());
+		assertEquals(gc.getTime(), persistedBook.getLaunchDate());
+		assertEquals(new BigDecimal(10).setScale(2), persistedBook.getPrice().setScale(2));
+		assertEquals("Title Book", persistedBook.getTitle());
+	}
+
+	@Test
+	@Order(8)
+	public void testDelete() throws JsonMappingException, JsonProcessingException {
+		//mockBook();
+
+		given()
+				.spec(requestSpecification)
+				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.pathParam("id", bookVO.getId())
+				.when()
+				.delete("{id}")
+				.then()
+				.statusCode(204);
+
+	}
+
+	@Test
+	@Order(9)
+	public void testHATEOAS() throws JsonMappingException, JsonProcessingException {
+
+		var content = given()
+				.spec(requestSpecification)
+				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.queryParams("page", 3, "size", 10, "direction", "asc")
+				.when()
+				.get()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+
+		assertTrue(content.contains("\"_links\":{\"first\":{\"href\":\"http://localhost:8090/api/book/v1?direction=asc&page=0&size=10&sort=id,asc\"}"));
+		assertTrue(content.contains("\"prev\":{\"href\":\"http://localhost:8090/api/book/v1?direction=asc&page=2&size=10&sort=id,asc\"}"));
+		assertTrue(content.contains("\"self\":{\"href\":\"http://localhost:8090/api/book/v1?page=3&size=3&direction=asc\"}"));
+		assertTrue(content.contains("\"last\":{\"href\":\"http://localhost:8090/api/book/v1?direction=asc&page=1&size=10&sort=id,asc\"}"));
+		assertTrue(content.contains("\"page\":{\"size\":10,\"totalElements\":15,\"totalPages\":2,\"number\":3}"));
+
+	}
+
 	private void mockBook() {
 		//bookVO.setId(1L);
 		bookVO.setAuthor("Author Book");
@@ -238,6 +389,7 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 		bookVO.setLaunchDate(gc.getTime());
 		bookVO.setPrice(BigDecimal.TEN);
 		bookVO.setTitle("Title Book");
+		bookVO.setEnabled(true);
 	}
 
 }

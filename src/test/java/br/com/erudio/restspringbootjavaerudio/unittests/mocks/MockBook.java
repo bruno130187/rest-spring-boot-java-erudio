@@ -40,6 +40,7 @@ public class MockBook {
         book.setLaunchDate(gc.getTime());
         book.setPrice(BigDecimal.TEN);
         book.setTitle("Title" + number);
+        book.setEnabled(((number % 2)==0) ? true : false);
         return book;
     }
 
@@ -51,6 +52,7 @@ public class MockBook {
         book.setLaunchDate(gc.getTime());
         book.setPrice(BigDecimal.TEN);
         book.setTitle("Title" + number);
+        book.setEnabled(((number % 2)==0) ? true : false);
         return book;
     }
 

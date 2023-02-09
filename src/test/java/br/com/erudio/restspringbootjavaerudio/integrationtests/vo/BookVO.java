@@ -25,15 +25,18 @@ public class BookVO implements Serializable {
     private BigDecimal price;
     private String title;
 
+    private Boolean enabled;
+
     public BookVO() {
     }
 
-    public BookVO(Long id, String author, Date launchDate, BigDecimal price, String priceFormatted, String title) {
+    public BookVO(Long id, String author, Date launchDate, BigDecimal price, String priceFormatted, String title, Boolean enabled) {
         this.id = id;
         this.author = author;
         this.launchDate = launchDate;
         this.price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.title = title;
+        this.enabled = enabled;
     }
 
     @Override
@@ -41,12 +44,12 @@ public class BookVO implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        BookVO bookVOV1 = (BookVO) o;
-        return id.equals(bookVOV1.id) && author.equals(bookVOV1.author) && launchDate.equals(bookVOV1.launchDate) && price.equals(bookVOV1.price) && title.equals(bookVOV1.title);
+        BookVO bookVO = (BookVO) o;
+        return id.equals(bookVO.id) && author.equals(bookVO.author) && launchDate.equals(bookVO.launchDate) && price.equals(bookVO.price) && title.equals(bookVO.title) && enabled.equals(bookVO.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, author, launchDate, price, title);
+        return Objects.hash(super.hashCode(), id, author, launchDate, price, title, enabled);
     }
 }

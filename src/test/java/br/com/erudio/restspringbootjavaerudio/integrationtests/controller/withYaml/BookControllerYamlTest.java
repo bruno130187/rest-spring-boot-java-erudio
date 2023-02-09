@@ -6,11 +6,11 @@ import br.com.erudio.restspringbootjavaerudio.data.vo.security.TokenVO;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.controller.withYaml.mapper.YMLMapper;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.BookVO;
+import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.PersonVO;
+import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.pagedModels.PagedModelBook;
+import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.pagedModels.PagedModelPerson;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -28,14 +28,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
@@ -173,13 +170,57 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 		assertEquals("Title Book", persistedBookVO.getTitle());
 	}
 
-
-
 	@Test
 	@Order(3)
+	public void testFindById() throws JsonMappingException, JsonProcessingException {
+		//mockBook();
+
+		var persistedBookVO = given().spec(requestSpecification)
+				.config(
+						RestAssuredConfig.config()
+								.encoderConfig(EncoderConfig.encoderConfig()
+										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+												ContentType.TEXT)))
+				.contentType(TestConfigs.CONTENT_TYPE_YML)
+				.accept(TestConfigs.CONTENT_TYPE_YML)
+				.pathParam("id", bookVO.getId())
+				.when()
+				.get("{id}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(BookVO.class, ymlMapper);
+
+		bookVO = persistedBookVO;
+
+		assertNotNull(persistedBookVO);
+
+		assertNotNull(persistedBookVO.getId());
+		assertNotNull(persistedBookVO.getId());
+		assertNotNull(persistedBookVO.getAuthor());
+		assertNotNull(persistedBookVO.getLaunchDate());
+		assertNotNull(persistedBookVO.getPrice());
+		assertNotNull(persistedBookVO.getTitle());
+		assertTrue(persistedBookVO.getEnabled());
+
+		assertEquals(bookVO.getId(), persistedBookVO.getId());
+
+		assertTrue(persistedBookVO.getId() > 0);
+
+		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
+
+		assertEquals("Author Book Updated 2", persistedBookVO.getAuthor());
+		assertEquals(gc.getTime(), persistedBookVO.getLaunchDate());
+		assertEquals(new BigDecimal(10).setScale(2), persistedBookVO.getPrice().setScale(2));
+		assertEquals("Title Book", persistedBookVO.getTitle());
+	}
+
+	@Test
+	@Order(4)
 	public void testFindAll() throws JsonMappingException, JsonProcessingException {
 
-		var content = given()
+		var wrapperBookVO = given()
 				.spec(requestSpecification)
 				.config(
 						RestAssuredConfig.config()
@@ -188,17 +229,18 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 												ContentType.TEXT)))
 				.contentType(TestConfigs.CONTENT_TYPE_YML)
 				.accept(TestConfigs.CONTENT_TYPE_YML)
+				.queryParams("page", 0, "size", 10, "direction", "asc")
 				.when()
 				.get()
 				.then()
 				.statusCode(200)
 				.extract()
 				.body()
-				.as(BookVO[].class, ymlMapper)
+				.as(PagedModelBook.class, ymlMapper)
 		;
 
-		List<BookVO> persistedBookVO = Arrays.asList(content);
-		BookVO foundBookOneVO = persistedBookVO.get(0);
+		var books = wrapperBookVO.getContent();
+		BookVO foundBookOneVO = books.get(0);
 
 		assertNotNull(foundBookOneVO);
 
@@ -219,7 +261,53 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 	}
 
 	@Test
-	@Order(4)
+	@Order(5)
+	public void testFindByTitle() throws JsonMappingException, JsonProcessingException {
+		//mockBook();
+
+		var wrapperPersonVO = given()
+				.spec(requestSpecification)
+				.config(
+						RestAssuredConfig.config()
+								.encoderConfig(EncoderConfig.encoderConfig()
+										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+												ContentType.TEXT)))
+				.contentType(TestConfigs.CONTENT_TYPE_YML)
+				.accept(TestConfigs.CONTENT_TYPE_YML)
+				.pathParam("title", "code")
+				.queryParams("page", 0, "size", 10, "direction", "asc")
+				.when()
+				.get("findBooksByTitle/{title}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(PagedModelBook.class, ymlMapper);
+
+		var books = wrapperPersonVO.getContent();
+		BookVO foundBookOneVO = books.get(0);
+
+		assertNotNull(foundBookOneVO);
+
+		assertNotNull(foundBookOneVO.getId());
+		assertNotNull(foundBookOneVO.getAuthor());
+		assertNotNull(foundBookOneVO.getLaunchDate());
+		assertNotNull(foundBookOneVO.getPrice());
+		assertNotNull(foundBookOneVO.getTitle());
+		assertTrue(foundBookOneVO.getEnabled());
+
+		assertTrue(foundBookOneVO.getId() > 0);
+
+		GregorianCalendar gc = new GregorianCalendar(2009, 00, 10);
+
+		assertEquals("Robert C. Martin", foundBookOneVO.getAuthor());
+		assertEquals(gc.getTime(), foundBookOneVO.getLaunchDate());
+		assertEquals(new BigDecimal(77).setScale(2), foundBookOneVO.getPrice().setScale(2));
+		assertEquals("Clean Code", foundBookOneVO.getTitle());
+	}
+
+	@Test
+	@Order(6)
 	public void testFindAllWithoutToken() throws JsonMappingException, JsonProcessingException {
 
 		RequestSpecification requestSpecificationWithoutToken = new RequestSpecBuilder()
@@ -247,7 +335,51 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 	}
 
 	@Test
-	@Order(5)
+	@Order(7)
+	public void testDisableBookById() throws JsonMappingException, JsonProcessingException {
+
+		var persistedBookVO = given()
+				.spec(requestSpecification)
+				.config(
+						RestAssuredConfig.config()
+								.encoderConfig(EncoderConfig.encoderConfig()
+										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+												ContentType.TEXT)))
+				.contentType(TestConfigs.CONTENT_TYPE_YML)
+				.accept(TestConfigs.CONTENT_TYPE_YML)
+				.pathParam("id", bookVO.getId())
+				.pathParam("enabled", 0)
+				.when()
+				.patch("{id}/{enabled}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.as(BookVO.class, ymlMapper);
+
+		bookVO = persistedBookVO;
+
+		assertNotNull(persistedBookVO);
+
+		assertNotNull(persistedBookVO.getId());
+		assertNotNull(persistedBookVO.getAuthor());
+		assertNotNull(persistedBookVO.getLaunchDate());
+		assertNotNull(persistedBookVO.getPrice());
+		assertNotNull(persistedBookVO.getTitle());
+		assertFalse(persistedBookVO.getEnabled());
+
+		assertEquals(bookVO.getId(), persistedBookVO.getId());
+
+		GregorianCalendar gc = new GregorianCalendar(2023, 01, 27);
+
+		assertEquals("Author Book Updated 2", persistedBookVO.getAuthor());
+		assertEquals(gc.getTime(), persistedBookVO.getLaunchDate());
+		assertEquals(new BigDecimal(10).setScale(2), persistedBookVO.getPrice().setScale(2));
+		assertEquals("Title Book", persistedBookVO.getTitle());
+	}
+
+	@Test
+	@Order(8)
 	public void testDelete() throws JsonMappingException, JsonProcessingException {
 		//mockBook();
 
@@ -268,6 +400,36 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 
 	}
 
+	@Test
+	@Order(9)
+	public void testHATEOAS() throws JsonMappingException, JsonProcessingException {
+
+		var content = given()
+				.spec(requestSpecification)
+				.config(
+						RestAssuredConfig.config()
+								.encoderConfig(EncoderConfig.encoderConfig()
+										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+												ContentType.TEXT)))
+				.contentType(TestConfigs.CONTENT_TYPE_YML)
+				.accept(TestConfigs.CONTENT_TYPE_YML)
+				.queryParams("page", 0, "size", 10, "direction", "asc")
+				.when()
+				.get()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+
+		assertTrue(content.contains("- rel: \"first\"\n  href: \"http://localhost:8090/api/book/v1?direction=asc&page=0&size=10&sort=id,asc\""));
+		assertTrue(content.contains("- rel: \"self\"\n  href: \"http://localhost:8090/api/book/v1?page=0&size=0&direction=asc\""));
+		assertTrue(content.contains("- rel: \"next\"\n  href: \"http://localhost:8090/api/book/v1?direction=asc&page=1&size=10&sort=id,asc\""));
+		assertTrue(content.contains("- rel: \"last\"\n  href: \"http://localhost:8090/api/book/v1?direction=asc&page=1&size=10&sort=id,asc\""));
+		assertTrue(content.contains("page:\n  size: 10\n  totalElements: 14\n  totalPages: 2\n  number: 0"));
+
+	}
+
 	private void mockBook() {
 		bookVO.setId(1L);
 		bookVO.setAuthor("Author Book");
@@ -275,6 +437,7 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 		bookVO.setLaunchDate(gc.getTime());
 		bookVO.setPrice(BigDecimal.TEN);
 		bookVO.setTitle("Title Book");
+		bookVO.setEnabled(true);
 	}
 
 }

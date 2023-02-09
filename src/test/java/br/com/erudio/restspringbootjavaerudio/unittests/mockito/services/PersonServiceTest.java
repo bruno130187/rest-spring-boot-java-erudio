@@ -140,11 +140,11 @@ class PersonServiceTest {
 
     @Test
     @Order(7)
-    void findAll() {
+    void findAllSimple() {
         List<Person> personList = mockPerson.mockEntityList();
 
-        when(personRepository.findAll()).thenReturn(personList);
-        var people = personService.findAll();
+        when(personRepository.findAllSimple()).thenReturn(personList);
+        var people = personService.findAllSimple();
         assertNotNull(people);
         assertEquals(14, people.size());
 

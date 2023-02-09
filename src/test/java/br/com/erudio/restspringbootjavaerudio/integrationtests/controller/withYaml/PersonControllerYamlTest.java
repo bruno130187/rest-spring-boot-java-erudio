@@ -6,11 +6,9 @@ import br.com.erudio.restspringbootjavaerudio.data.vo.security.TokenVO;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.controller.withYaml.mapper.YMLMapper;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.PersonVO;
+import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.pagedModels.PagedModelPerson;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -27,9 +25,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,321 +32,399 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
 @TestPropertySource("classpath:testcontainers.properties")
-public class PersonControllerYamlTest extends AbstractIntegrationTest{
-	private static RequestSpecification requestSpecification;
-	private static YMLMapper ymlMapper;
-	private static PersonVO personVO;
-	private final String user = "leandro";
-	private final String pass = "123456";
-	@BeforeAll
-	public static void setup() {
-		ymlMapper = new YMLMapper();
-		personVO = new PersonVO();
-	}
-	@Test
-	@Order(0)
-	public void testAuthorization() throws JsonMappingException, JsonProcessingException {
+public class PersonControllerYamlTest extends AbstractIntegrationTest {
+    private static RequestSpecification requestSpecification;
+    private static YMLMapper ymlMapper;
+    private static PersonVO personVO;
+    private final String user = "leandro";
+    private final String pass = "123456";
 
-		AccountCredentialsVO accountCredentialsVO = new AccountCredentialsVO(user, pass);
+    @BeforeAll
+    public static void setup() {
+        ymlMapper = new YMLMapper();
+        personVO = new PersonVO();
+    }
 
-		var accessToken = given()
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.basePath("/auth/signin")
-					.port(TestConfigs.SERVER_PORT)
-					.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.body(accountCredentialsVO, ymlMapper)
-					.when()
-					.post()
-				.then()
-					.statusCode(200 )
-					.extract()
-					.body().as(TokenVO.class, ymlMapper)
-					.getAccessToken();
+    @Test
+    @Order(0)
+    public void testAuthorization() throws JsonMappingException, JsonProcessingException {
 
-		requestSpecification = new RequestSpecBuilder()
-				.addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCALHOST)
-				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + accessToken)
-				.setBasePath("/api/person/v1")
-				.setPort(TestConfigs.SERVER_PORT)
-				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
+        AccountCredentialsVO accountCredentialsVO = new AccountCredentialsVO(user, pass);
 
-	}
-	@Test
-	@Order(1)
-	public void testCreate() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+        var accessToken = given()
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .basePath("/auth/signin")
+                .port(TestConfigs.SERVER_PORT)
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .body(accountCredentialsVO, ymlMapper)
+                .when()
+                .post()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body().as(TokenVO.class, ymlMapper)
+                .getAccessToken();
 
-		var persistedPersonVO = given()
-				.spec(requestSpecification)
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.accept(TestConfigs.CONTENT_TYPE_YML)
-				.body(personVO, ymlMapper)
-				.when()
-					.post()
-				.then()
-					.statusCode(200)
-						.extract()
-							.body()
-								.as(PersonVO.class, ymlMapper);
-		
+        requestSpecification = new RequestSpecBuilder()
+                .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCALHOST)
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + accessToken)
+                .setBasePath("/api/person/v1")
+                .setPort(TestConfigs.SERVER_PORT)
+                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+                .build();
 
-		personVO = persistedPersonVO;
-		
-		assertNotNull(persistedPersonVO);
-		
-		assertNotNull(persistedPersonVO.getId());
-		assertNotNull(persistedPersonVO.getFirstName());
-		assertNotNull(persistedPersonVO.getLastName());
-		assertNotNull(persistedPersonVO.getAddress());
-		assertNotNull(persistedPersonVO.getGender());
-		assertTrue(persistedPersonVO.getEnabled());
-		
-		assertTrue(persistedPersonVO.getId() > 0);
+    }
 
-		assertEquals("Nelson", persistedPersonVO.getFirstName());
-		assertEquals("Piquet", persistedPersonVO.getLastName());
-		assertEquals("São Paulo, SP, BR", persistedPersonVO.getAddress());
-		assertEquals("Male", persistedPersonVO.getGender());
-	}
+    @Test
+    @Order(1)
+    public void testCreate() throws JsonMappingException, JsonProcessingException {
+        mockPerson();
 
-	@Test
-	@Order(2)
-	public void testUpdate() throws JsonMappingException, JsonProcessingException {
-		personVO.setLastName("Senna");
+        var persistedPersonVO = given()
+                .spec(requestSpecification)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .body(personVO, ymlMapper)
+                .when()
+                .post()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PersonVO.class, ymlMapper);
 
-		var persistedPersonVO = given()
-				.spec(requestSpecification)
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.accept(TestConfigs.CONTENT_TYPE_YML)
-				.body(personVO, ymlMapper)
-					.when()
-					.post()
-				.then()
-				.statusCode(200)
-					.extract()
-				.body()
-				.as(PersonVO.class, ymlMapper);
+        System.out.println("PERSON: " + persistedPersonVO);
 
-		personVO = persistedPersonVO;
+        personVO = persistedPersonVO;
 
-		assertNotNull(persistedPersonVO);
+        assertNotNull(persistedPersonVO);
 
-		assertNotNull(persistedPersonVO.getId());
-		assertNotNull(persistedPersonVO.getFirstName());
-		assertNotNull(persistedPersonVO.getLastName());
-		assertNotNull(persistedPersonVO.getAddress());
-		assertNotNull(persistedPersonVO.getGender());
-		assertTrue(persistedPersonVO.getEnabled());
+        assertNotNull(persistedPersonVO.getId());
+        assertNotNull(persistedPersonVO.getFirstName());
+        assertNotNull(persistedPersonVO.getLastName());
+        assertNotNull(persistedPersonVO.getAddress());
+        assertNotNull(persistedPersonVO.getGender());
+        assertTrue(persistedPersonVO.getEnabled());
 
-		assertEquals(persistedPersonVO.getId(), personVO.getId());
+        assertTrue(persistedPersonVO.getId() > 0);
 
-		assertTrue(persistedPersonVO.getId() > 0);
+        assertEquals("Nelson", persistedPersonVO.getFirstName());
+        assertEquals("Piquet", persistedPersonVO.getLastName());
+        assertEquals("São Paulo, SP, BR", persistedPersonVO.getAddress());
+        assertEquals("Male", persistedPersonVO.getGender());
+    }
 
-		assertEquals("Nelson", persistedPersonVO.getFirstName());
-		assertEquals("Senna", persistedPersonVO.getLastName());
-		assertEquals("São Paulo, SP, BR", persistedPersonVO.getAddress());
-		assertEquals("Male", persistedPersonVO.getGender());
-	}
+    @Test
+    @Order(2)
+    public void testUpdate() throws JsonMappingException, JsonProcessingException {
+        personVO.setLastName("Senna");
 
-	@Test
-	@Order(3)
-	public void testFindById() throws JsonMappingException, JsonProcessingException {
-		//mockPerson();
+        var persistedPersonVO = given()
+                .spec(requestSpecification)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .body(personVO, ymlMapper)
+                .when()
+                .post()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PersonVO.class, ymlMapper);
 
-		var persistedPersonVO = given()
-				.spec(requestSpecification)
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.accept(TestConfigs.CONTENT_TYPE_YML)
-				.pathParam("id", personVO.getId())
-				.when()
-				.get("{id}")
-				.then()
-				.statusCode(200)
-				.extract()
-				.body()
-				.as(PersonVO.class, ymlMapper);
+        personVO = persistedPersonVO;
 
-		personVO = persistedPersonVO;
+        assertNotNull(persistedPersonVO);
 
-		assertNotNull(personVO);
+        assertNotNull(persistedPersonVO.getId());
+        assertNotNull(persistedPersonVO.getFirstName());
+        assertNotNull(persistedPersonVO.getLastName());
+        assertNotNull(persistedPersonVO.getAddress());
+        assertNotNull(persistedPersonVO.getGender());
+        assertTrue(persistedPersonVO.getEnabled());
 
-		assertNotNull(personVO.getId());
-		assertNotNull(personVO.getFirstName());
-		assertNotNull(personVO.getLastName());
-		assertNotNull(personVO.getAddress());
-		assertNotNull(personVO.getGender());
-		assertTrue(personVO.getEnabled());
+        assertEquals(persistedPersonVO.getId(), personVO.getId());
 
-		assertEquals(personVO.getId(), personVO.getId());
+        assertTrue(persistedPersonVO.getId() > 0);
 
-		assertEquals("Nelson", personVO.getFirstName());
-		assertEquals("Senna", personVO.getLastName());
-		assertEquals("São Paulo, SP, BR", personVO.getAddress());
-		assertEquals("Male", personVO.getGender());
-	}
+        assertEquals("Nelson", persistedPersonVO.getFirstName());
+        assertEquals("Senna", persistedPersonVO.getLastName());
+        assertEquals("São Paulo, SP, BR", persistedPersonVO.getAddress());
+        assertEquals("Male", persistedPersonVO.getGender());
+    }
 
-	@Test
-	@Order(4)
-	public void testFindAll() throws JsonMappingException, JsonProcessingException {
+    @Test
+    @Order(3)
+    public void testFindById() throws JsonMappingException, JsonProcessingException {
+        //mockPerson();
 
-		var content = given()
-				.spec(requestSpecification)
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.accept(TestConfigs.CONTENT_TYPE_YML)
-				.when()
-				.get()
-				.then()
-				.statusCode(200)
-				.extract()
-				.body()
-				.as(PersonVO[].class, ymlMapper);
-		;
+        var persistedPersonVO = given()
+                .spec(requestSpecification)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .pathParam("id", personVO.getId())
+                .when()
+                .get("{id}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PersonVO.class, ymlMapper);
 
-		List<PersonVO> persistedPersonVO = Arrays.asList(content);
-		PersonVO foundPersonOneVO = persistedPersonVO.get(0);
+        personVO = persistedPersonVO;
 
-		assertNotNull(foundPersonOneVO);
+        assertNotNull(personVO);
 
-		assertNotNull(foundPersonOneVO.getId());
-		assertNotNull(foundPersonOneVO.getFirstName());
-		assertNotNull(foundPersonOneVO.getLastName());
-		assertNotNull(foundPersonOneVO.getAddress());
-		assertNotNull(foundPersonOneVO.getGender());
-		assertTrue(foundPersonOneVO.getEnabled());
+        assertNotNull(personVO.getId());
+        assertNotNull(personVO.getFirstName());
+        assertNotNull(personVO.getLastName());
+        assertNotNull(personVO.getAddress());
+        assertNotNull(personVO.getGender());
+        assertTrue(personVO.getEnabled());
 
-		assertTrue(foundPersonOneVO.getId() > 0);
+        assertEquals(personVO.getId(), personVO.getId());
 
-		assertEquals("Bruno", foundPersonOneVO.getFirstName());
-		assertEquals("Araújo", foundPersonOneVO.getLastName());
-		assertEquals("Endereço 3", foundPersonOneVO.getAddress());
-		assertEquals("Male", foundPersonOneVO.getGender());
-	}
+        assertEquals("Nelson", personVO.getFirstName());
+        assertEquals("Senna", personVO.getLastName());
+        assertEquals("São Paulo, SP, BR", personVO.getAddress());
+        assertEquals("Male", personVO.getGender());
+    }
 
-	@Test
-	@Order(5)
-	public void testFindAllWithoutToken() throws JsonMappingException, JsonProcessingException {
+    @Test
+    @Order(4)
+    public void testFindAll() throws JsonMappingException, JsonProcessingException {
 
-		RequestSpecification requestSpecificationWithoutToken = new RequestSpecBuilder()
-				.setBasePath("/api/person/v1")
-				.setPort(TestConfigs.SERVER_PORT)
-				.addFilter(new RequestLoggingFilter(LogDetail.ALL))
-				.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-				.build();
+        var wrapperPersonVO = given()
+                .spec(requestSpecification)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .queryParams("page", 0, "size", 10, "direction", "asc")
+                .when()
+                .get()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedModelPerson.class, ymlMapper);
+        ;
 
-		given()
-				.spec(requestSpecificationWithoutToken)
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.accept(TestConfigs.CONTENT_TYPE_YML)
-				.when()
-				.get()
-				.then()
-				.statusCode(401)
-				;
+        var people = wrapperPersonVO.getContent();
+        PersonVO foundPersonOneVO = people.get(0);
 
-	}
+        assertNotNull(foundPersonOneVO);
 
-	@Test
-	@Order(6)
-	public void testDisablePersonById() throws JsonMappingException, JsonProcessingException {
+        assertNotNull(foundPersonOneVO.getId());
+        assertNotNull(foundPersonOneVO.getFirstName());
+        assertNotNull(foundPersonOneVO.getLastName());
+        assertNotNull(foundPersonOneVO.getAddress());
+        assertNotNull(foundPersonOneVO.getGender());
+        assertTrue(foundPersonOneVO.getEnabled());
 
-		var persistedPersonVO = given()
-				.spec(requestSpecification)
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.accept(TestConfigs.CONTENT_TYPE_YML)
-				.pathParam("id", personVO.getId())
-				.pathParam("enabled", 0)
-				.when()
-				.patch("{id}/{enabled}")
-				.then()
-				.statusCode(200)
-				.extract()
-				.body()
-				.as(PersonVO.class, ymlMapper);
+        assertTrue(foundPersonOneVO.getId() > 0);
 
-		personVO = persistedPersonVO;
+        assertEquals("Bruno", foundPersonOneVO.getFirstName());
+        assertEquals("Araújo", foundPersonOneVO.getLastName());
+        assertEquals("Endereço 3", foundPersonOneVO.getAddress());
+        assertEquals("Male", foundPersonOneVO.getGender());
+    }
 
-		assertNotNull(personVO);
+    @Test
+    @Order(5)
+    public void testFindByName() throws JsonMappingException, JsonProcessingException {
 
-		assertNotNull(personVO.getId());
-		assertNotNull(personVO.getFirstName());
-		assertNotNull(personVO.getLastName());
-		assertNotNull(personVO.getAddress());
-		assertNotNull(personVO.getGender());
-		assertFalse(personVO.getEnabled());
+        var wrapperPersonVO = given()
+                .spec(requestSpecification)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .pathParam("firstName", "and")
+                .queryParams("page", 0, "size", 10, "direction", "asc")
+                .when()
+                .get("findPeopleByName/{firstName}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedModelPerson.class, ymlMapper);
 
-		assertEquals(personVO.getId(), personVO.getId());
+        var people = wrapperPersonVO.getContent();
+        PersonVO foundPersonOneVO = people.get(0);
 
-		assertEquals("Nelson", personVO.getFirstName());
-		assertEquals("Senna", personVO.getLastName());
-		assertEquals("São Paulo, SP, BR", personVO.getAddress());
-		assertEquals("Male", personVO.getGender());
-	}
+        assertNotNull(foundPersonOneVO);
 
-	@Test
-	@Order(7)
-	public void testDelete() throws JsonMappingException, JsonProcessingException {
-		//mockPerson();
+        assertNotNull(foundPersonOneVO.getId());
+        assertNotNull(foundPersonOneVO.getFirstName());
+        assertNotNull(foundPersonOneVO.getLastName());
+        assertNotNull(foundPersonOneVO.getAddress());
+        assertNotNull(foundPersonOneVO.getGender());
+        assertTrue(foundPersonOneVO.getEnabled());
 
-		given()
-				.spec(requestSpecification)
-				.config(
-						RestAssuredConfig.config()
-								.encoderConfig(EncoderConfig.encoderConfig()
-										.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
-												ContentType.TEXT)))
-				.contentType(TestConfigs.CONTENT_TYPE_YML)
-				.accept(TestConfigs.CONTENT_TYPE_YML)
-				.pathParam("id", personVO.getId())
-				.when()
-				.delete("{id}")
-				.then()
-				.statusCode(204);
+        assertTrue(foundPersonOneVO.getId() > 0);
 
-	}
+        assertEquals("Wayland", foundPersonOneVO.getFirstName());
+        assertEquals("Thamelt", foundPersonOneVO.getLastName());
+        assertEquals("337 Everett Park", foundPersonOneVO.getAddress());
+        assertEquals("Male", foundPersonOneVO.getGender());
+    }
 
-	private static void mockPerson() {
-		personVO.setId(1L);
-		personVO.setFirstName("Nelson");
-		personVO.setLastName("Piquet");
-		personVO.setAddress("São Paulo, SP, BR");
-		personVO.setGender("Male");
-		personVO.setEnabled(true);
-	}
+    @Test
+    @Order(6)
+    public void testFindAllWithoutToken() throws JsonMappingException, JsonProcessingException {
+
+        RequestSpecification requestSpecificationWithoutToken = new RequestSpecBuilder()
+                .setBasePath("/api/person/v1")
+                .setPort(TestConfigs.SERVER_PORT)
+                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+                .build();
+
+        given()
+                .spec(requestSpecificationWithoutToken)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .when()
+                .get()
+                .then()
+                .statusCode(401)
+        ;
+
+    }
+
+    @Test
+    @Order(7)
+    public void testDisablePersonById() throws JsonMappingException, JsonProcessingException {
+
+        var persistedPersonVO = given()
+                .spec(requestSpecification)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .pathParam("id", personVO.getId())
+                .pathParam("enabled", 0)
+                .when()
+                .patch("{id}/{enabled}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PersonVO.class, ymlMapper);
+
+        personVO = persistedPersonVO;
+
+        assertNotNull(personVO);
+
+        assertNotNull(personVO.getId());
+        assertNotNull(personVO.getFirstName());
+        assertNotNull(personVO.getLastName());
+        assertNotNull(personVO.getAddress());
+        assertNotNull(personVO.getGender());
+        assertFalse(personVO.getEnabled());
+
+        assertEquals(personVO.getId(), personVO.getId());
+
+        assertEquals("Nelson", personVO.getFirstName());
+        assertEquals("Senna", personVO.getLastName());
+        assertEquals("São Paulo, SP, BR", personVO.getAddress());
+        assertEquals("Male", personVO.getGender());
+    }
+
+    @Test
+    @Order(8)
+    public void testDelete() throws JsonMappingException, JsonProcessingException {
+        //mockPerson();
+
+        given()
+                .spec(requestSpecification)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .pathParam("id", personVO.getId())
+                .when()
+                .delete("{id}")
+                .then()
+                .statusCode(204);
+
+    }
+
+    @Test
+    @Order(9)
+    public void testHATEOAS() throws JsonMappingException, JsonProcessingException {
+
+        var content = given()
+                .spec(requestSpecification)
+                .config(
+                        RestAssuredConfig.config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .queryParams("page", 0, "size", 10, "direction", "asc")
+                .when()
+                .get()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        assertTrue(content.contains("links:\n- rel: \"first\"\n  href: \"http://localhost:8090/api/person/v1?direction=asc&page=0&size=10&sort=id,asc\""));
+        assertTrue(content.contains("- rel: \"self\"\n  href: \"http://localhost:8090/api/person/v1?page=0&size=0&direction=asc\""));
+        assertTrue(content.contains("- rel: \"next\"\n  href: \"http://localhost:8090/api/person/v1?direction=asc&page=1&size=10&sort=id,asc\""));
+        assertTrue(content.contains("- rel: \"last\"\n  href: \"http://localhost:8090/api/person/v1?direction=asc&page=100&size=10&sort=id,asc\""));
+        assertTrue(content.contains("page:\n  size: 10\n  totalElements: 1005\n  totalPages: 101\n  number: 0"));
+
+    }
+
+    private static void mockPerson() {
+        personVO.setId(1L);
+        personVO.setFirstName("Nelson");
+        personVO.setLastName("Piquet");
+        personVO.setAddress("São Paulo, SP, BR");
+        personVO.setGender("Male");
+        personVO.setEnabled(true);
+    }
 
 }

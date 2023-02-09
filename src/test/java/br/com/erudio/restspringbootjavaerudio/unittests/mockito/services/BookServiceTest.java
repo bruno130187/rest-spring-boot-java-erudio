@@ -116,13 +116,13 @@ class BookServiceTest {
     }
 
     @Test
-    void findAll() {
+    void findAllSimple() {
         List<Book> bookList = mockBook.mockEntityList();
 
         GregorianCalendar gc = new GregorianCalendar(2023, 01, 05);
 
-        when(bookRepository.findAll()).thenReturn(bookList);
-        var books = bookService.findAll();
+        when(bookRepository.findAllSimple()).thenReturn(bookList);
+        var books = bookService.findAllSimple();
         assertNotNull(books);
         assertEquals(14, books.size());
 

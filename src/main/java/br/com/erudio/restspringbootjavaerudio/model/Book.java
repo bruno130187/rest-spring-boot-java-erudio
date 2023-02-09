@@ -30,16 +30,19 @@ public class Book implements Serializable {
     private BigDecimal price;
     @Column(name = "title", nullable = false, length = 255)
     private String title;
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled;
 
     public Book() {
     }
 
-    public Book(Long id, String author, Date launchDate, BigDecimal price, String title) {
+    public Book(Long id, String author, Date launchDate, BigDecimal price, String title, Boolean enabled) {
         this.id = id;
         this.author = author;
         this.launchDate = launchDate;
         this.price = price;
         this.title = title;
+        this.enabled = enabled;
     }
 
     @Override
@@ -47,12 +50,12 @@ public class Book implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return id.equals(book.id) && author.equals(book.author) && launchDate.equals(book.launchDate) && price.equals(book.price) && title.equals(book.title);
+        return id.equals(book.id) && author.equals(book.author) && launchDate.equals(book.launchDate) && price.equals(book.price) && title.equals(book.title) && enabled.equals(book.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, author, launchDate, price, title);
+        return Objects.hash(id, author, launchDate, price, title, enabled);
     }
 
 }
