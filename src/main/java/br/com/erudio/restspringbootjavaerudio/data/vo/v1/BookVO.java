@@ -35,15 +35,18 @@ public class BookVO extends RepresentationModel<BookVO> implements Serializable 
     private BigDecimal price;
     private String title;
 
+    private Boolean enabled;
+
     public BookVO() {
     }
 
-    public BookVO(Long key, String author, Date launchDate, BigDecimal price, String priceFormatted, String title) {
+    public BookVO(Long key, String author, Date launchDate, BigDecimal price, String priceFormatted, String title, Boolean enabled) {
         this.key = key;
         this.author = author;
         this.launchDate = launchDate;
         this.price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
         this.title = title;
+        this.enabled = enabled;
     }
 
     @Override
@@ -52,11 +55,11 @@ public class BookVO extends RepresentationModel<BookVO> implements Serializable 
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         BookVO bookVO = (BookVO) o;
-        return key.equals(bookVO.key) && author.equals(bookVO.author) && launchDate.equals(bookVO.launchDate) && price.equals(bookVO.price) && title.equals(bookVO.title);
+        return key.equals(bookVO.key) && author.equals(bookVO.author) && launchDate.equals(bookVO.launchDate) && price.equals(bookVO.price) && title.equals(bookVO.title) && enabled.equals(bookVO.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), key, author, launchDate, price, title);
+        return Objects.hash(super.hashCode(), key, author, launchDate, price, title, enabled);
     }
 }

@@ -13,6 +13,7 @@ public class PersonVO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+
 	private String firstName;
 	private String lastName;
 	private String address;
@@ -20,6 +21,15 @@ public class PersonVO implements Serializable {
 	private Boolean enabled;
 	
 	public PersonVO() {}
+
+	public PersonVO(Long id, String firstName, String lastName, String address, String gender, Boolean enabled) {
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.address = address;
+		this.gender = gender;
+		this.enabled = enabled;
+	}
 
 	@Override
 	public boolean equals(Object o) {

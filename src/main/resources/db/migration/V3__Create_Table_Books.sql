@@ -3,5 +3,5 @@
   [author] [varchar](255),
   [launch_date] [date] NOT NULL,
   [price] [decimal](38,2) NOT NULL,
-  [title] [text]);
+  [title] [nvarchar](max));
 SET IDENTITY_INSERT [dbo].[books] OFF;
