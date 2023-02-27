@@ -5,7 +5,7 @@ import br.com.erudio.restspringbootjavaerudio.data.vo.security.AccountCredential
 import br.com.erudio.restspringbootjavaerudio.data.vo.security.TokenVO;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.testcontainers.AbstractIntegrationTest;
 import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.BookVO;
-import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.PersonVO;
+
 import br.com.erudio.restspringbootjavaerudio.integrationtests.vo.wrapper.WrapperBookVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
