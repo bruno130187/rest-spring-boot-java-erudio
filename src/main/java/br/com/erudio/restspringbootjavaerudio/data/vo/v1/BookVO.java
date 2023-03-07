@@ -40,7 +40,7 @@ public class BookVO extends RepresentationModel<BookVO> implements Serializable 
     public BookVO() {
     }
 
-    public BookVO(Long key, String author, Date launchDate, BigDecimal price, String priceFormatted, String title, Boolean enabled) {
+    public BookVO(Long key, String author, Date launchDate, BigDecimal price, String title, Boolean enabled) {
         this.key = key;
         this.author = author;
         this.launchDate = launchDate;
