@@ -1,5 +1,5 @@
-# rest-spring-boot-java-erudio
-Curso Spring Boot 3 RESTful Java Completo
+# rest-spring-boot-java-erudio-server
+Curso Spring Boot 3 RESTful Java Completo (backend)
 
 # Link do Projeto Client em React.js, projeto que tem a view que consome o json gerado por este server
 
