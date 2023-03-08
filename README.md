@@ -25,6 +25,8 @@ spring.datasource.username e spring.datasource.password
 
 [https://catalog.s.download.windowsupdate.com/d/msdownload/update/software/updt/2022/06/ssms-setup-enu_2d6b129259b4870fb12d735f8bcd34403950075c.exe]
 
+## Para que o Flyway consiga criar as tabelas do projeto automaticamente você precisa criar uma nova database chamada "rest-spring-boot-erudio" no MSSQL usando o Management Studio. Só após isso você irá startar o projeto na sua IDEA.
+
 ## E para baixar o Postman que é o programa usado para testar os endpoints criados neste projeto backend clique abaixo:
 
 [https://www.postman.com/downloads/]
