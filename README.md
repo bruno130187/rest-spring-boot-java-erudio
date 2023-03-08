@@ -35,4 +35,8 @@ spring.datasource.username e spring.datasource.password
 
 [https://drive.google.com/file/d/1FPUGAd2eF4ERILmZOmUzZeUIKEvWmJ_a/view?usp=sharing]
 
+Qualquer dúvida segue a fonte do projeto que foi feito seguindo um curso do Professor Leandro Costa da Udemy ou me chame pelo LinkedIn:
+
+[https://www.udemy.com/course/restful-apis-do-0-a-nuvem-com-springboot-e-docker/]
+
 Segue meu LinkedIn: [https://www.linkedin.com/in/bruno-araujo-oficial/]
